@@ -4,7 +4,15 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Form } from "./ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+import { Input } from "./ui/input";
 
 type FormType = "sign-up" | "sign-in";
 
@@ -36,6 +44,51 @@ const AuthForm = ({ type }: { type: FormType }) => {
           <h1 className="form-title">
             {type === "sign-up" ? "Sign Up" : "Sign In"}
           </h1>
+          {type === "sign-up" && (
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="shad-form-item">
+                    <FormLabel className="shad-form-label">Full Name</FormLabel>
+
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your full name"
+                        className="shad-input"
+                        {...field}
+                      />
+                    </FormControl>
+                  </div>
+
+                  <FormMessage className="shad-form-message" />
+                </FormItem>
+              )}
+            />
+          )}
+
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <div className="shad-form-item">
+                  <FormLabel className="shad-form-label">Email</FormLabel>
+
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your email"
+                      className="shad-input"
+                      {...field}
+                    />
+                  </FormControl>
+                </div>
+
+                <FormMessage className="shad-form-message" />
+              </FormItem>
+            )}
+          />
         </form>
       </Form>
     </>
