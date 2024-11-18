@@ -6,9 +6,9 @@ import { cookies } from "next/headers";
 
 /**
  * Creates an Appwrite client using the session cookie.
- * 
+ *
  * @throws Will throw an error if no session with the given ID is found.
- * 
+ *
  * @returns An object containing accessors for the `account` and `database`
  * services authenticated with the session.
  */
@@ -28,7 +28,7 @@ export const createSessionClient = async () => {
     get account() {
       return new Account(client);
     },
-    get database() {
+    get databases() {
       return new Databases(client);
     },
   };
@@ -51,7 +51,7 @@ export const createAdminClient = async () => {
     get account() {
       return new Account(client);
     },
-    get database() {
+    get databases() {
       return new Databases(client);
     },
     get storage() {
