@@ -18,6 +18,18 @@ const getUserByEmail = async (email: string) => {
   return result.total > 0 ? result.documents[0] : null;
 };
 
+export const sendEmailOTP = async ({ email }: { email: string }) => {
+  const { account } = await createAdminClient();
+
+  try {
+    const session = await account.createEmailToken(ID.unique(), email);
+
+    return session.userId;
+  } catch (error) {
+    // TODO: handle error
+  }
+};
+
 export const createAccount = async ({
   fullName,
   email,
@@ -26,6 +38,9 @@ export const createAccount = async ({
   email: string;
 }) => {
   const existingUser = await getUserByEmail(email);
+
+  const accountId = await sendEmailOTP({ email });
+  if (!accountId) throw new Error("Something went wrong");
 
   if (!existingUser) {
     const { databases } = await createAdminClient();
@@ -38,10 +53,11 @@ export const createAccount = async ({
         fullName,
         email,
         avatar: avatarPlaceholderUrl,
-        // accountId
+        accountId
       }
     );
   }
 
-  return;
+  // TODO: parse and set accountId
+  return parseStringify({ accountId });
 };
