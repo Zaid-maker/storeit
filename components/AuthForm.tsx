@@ -53,8 +53,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
             })
           : null;
 
-      // TODO: properly set account id
-      // setAccountId(user.accountId)
+      setAccountId(user.accountId);
     } catch (error) {
       setErrorMessage("Something went wrong. Please try again later.");
     } finally {
