@@ -4,6 +4,7 @@ import { get } from "http";
 import { createAdminClient } from "../appwrite";
 import { appwriteConfig } from "../appwrite/config";
 import { ID, Query } from "node-appwrite";
+import { avatarPlaceholderUrl } from "@/constants";
 
 const getUserByEmail = async (email: string) => {
   const { databases } = await createAdminClient();
@@ -36,7 +37,7 @@ export const createAccount = async ({
       {
         fullName,
         email,
-        // avatar: avatarPlaceholderUrl,
+        avatar: avatarPlaceholderUrl,
         // accountId
       }
     );
