@@ -1,7 +1,7 @@
 "use server";
 
 import { get } from "http";
-import { createAdminClient } from "../appwrite";
+import { createAdminClient, createSessionClient } from "../appwrite";
 import { appwriteConfig } from "../appwrite/config";
 import { ID, Query } from "node-appwrite";
 import { avatarPlaceholderUrl } from "@/constants";
@@ -60,4 +60,29 @@ export const createAccount = async ({
   }
 
   return parseStringify({ accountId });
+};
+
+/**
+ * Gets the current user based on the session.
+ *
+ * @returns The current user in the system if a session exists, otherwise null.
+ */
+export const getCurrentUser = async () => {
+  try {
+    const { databases, account } = await createSessionClient();
+
+    const result = await account.get();
+
+    const user = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      [Query.equal("accountId", [result.$id])]
+    );
+
+    if (user.total <= 0) return null;
+
+    return parseStringify(user.documents[0]);
+  } catch (error) {
+    console.log(error);
+  }
 };
