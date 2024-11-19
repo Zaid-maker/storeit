@@ -72,13 +72,13 @@ export const Sidebar = ({ fullName, email, avatar }: Props) => {
       />
 
       <div className="sidebar-user-info">
-        <Image
+        {/* <Image
           src={avatar}
           alt="Avatar"
           width={44}
           height={44}
           className="sidebar-user-avatar"
-        />
+        /> */}
         <div className="hidden lg:block">
           <p className="subtitle-2 capitalize">{fullName}</p>
           <p className="caption">{email}</p>
