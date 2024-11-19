@@ -1,7 +1,18 @@
-import React from 'react'
+import { Chart } from "@/components/Chart";
+import React from "react";
 
-export const Dashboard = () => {
+const Dashboard = () => {
   return (
-    <div>Dashboard</div>
-  )
-}
+    <div className="dashboard-container">
+      <section>
+        {/** TODO: Chart */}
+        <Chart />
+
+        {/** TODO: Summary List */}
+        <ul className="dashboard-summary-list"></ul>
+      </section>
+    </div>
+  );
+};
+
+export default Dashboard;
