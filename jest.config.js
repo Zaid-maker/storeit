@@ -2,7 +2,10 @@
 const config = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: [
+    '<rootDir>/jest.setup.ts',
+    '<rootDir>/test/setup/mockAppwrite.ts'
+  ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
@@ -36,6 +39,45 @@ const config = {
       statements: 80,
     },
   },
+  reporters: [
+    'default',
+    ['jest-junit', {
+      outputDirectory: 'reports/junit',
+      outputName: 'junit.xml',
+      classNameTemplate: '{classname}',
+      titleTemplate: '{title}',
+      ancestorSeparator: ' › ',
+      usePathForSuiteName: true,
+    }],
+    ['jest-html-reporter', {
+      pageTitle: 'StoreIt Test Report',
+      outputPath: 'reports/test-report.html',
+      includeFailureMsg: true,
+      includeSuiteFailure: true,
+      styleOverridePath: 'reporter-styles.css',
+      sort: 'status',
+      statusIgnoreFilter: null,
+      includeConsoleLog: true,
+      useCSSFile: true,
+    }],
+  ],
+  coverageReporters: [
+    'text',
+    'html',
+    'lcov',
+    'cobertura',
+  ],
+  testTimeout: 10000,
+  maxWorkers: '50%',
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.json',
+      isolatedModules: true,
+    },
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!node-appwrite)',
+  ],
 };
 
 module.exports = config;

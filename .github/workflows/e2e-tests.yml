@@ -8,6 +8,12 @@ on:
   # Allow manual trigger
   workflow_dispatch:
 
+env:
+  NEXT_PUBLIC_APPWRITE_PROJECT_ID: test-project-id
+  NEXT_PUBLIC_APPWRITE_ENDPOINT: http://localhost/v1
+  NEXT_PUBLIC_APPWRITE_DATABASE_ID: test-database-id
+  APPWRITE_API_KEY: test-api-key
+
 jobs:
   test:
     timeout-minutes: 60
@@ -26,6 +32,9 @@ jobs:
           bun install
           bunx playwright install --with-deps
 
+      - name: Create auth directory
+        run: mkdir -p playwright/.auth
+
       - name: Build Next.js app
         run: bun run build
 
@@ -40,7 +49,6 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
-  # Separate job for running integration tests
   integration:
     runs-on: ubuntu-latest
 
@@ -57,11 +65,77 @@ jobs:
 
       - name: Run Jest tests
         run: bun run test:coverage
+        env:
+          NODE_ENV: test
 
       - name: Upload coverage reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage/
+          path: |
+            coverage/
+            reports/
           retention-days: 30
+
+  publish-reports:
+    needs: [test, integration]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Build report site
+        run: |
+          mkdir -p _site
+          cp -r artifacts/coverage-report/* _site/
+          cp -r artifacts/playwright-report/* _site/playwright
+          # Create index page
+          cat > _site/index.html << 'EOL'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>StoreIt Test Reports</title>
+            <style>
+              body { font-family: system-ui; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+              .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+              .card h2 { margin-top: 0; }
+              a { color: #4299e1; text-decoration: none; }
+              a:hover { text-decoration: underline; }
+            </style>
+          </head>
+          <body>
+            <h1>StoreIt Test Reports</h1>
+            <div class="card">
+              <h2>Coverage Report</h2>
+              <p><a href="./lcov-report/index.html">View Coverage Report</a></p>
+            </div>
+            <div class="card">
+              <h2>Test Results</h2>
+              <p><a href="./test-report.html">View Test Report</a></p>
+            </div>
+            <div class="card">
+              <h2>E2E Test Results</h2>
+              <p><a href="./playwright/index.html">View Playwright Report</a></p>
+            </div>
+          </body>
+          </html>
+          EOL
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
