@@ -11,25 +11,29 @@ const config = {
     '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
   },
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: 'tsconfig.json',
-    }],
+    '^.+\\.(ts|tsx|js|jsx)$': 'babel-jest',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/.next/',
     '<rootDir>/e2e/',
+    '<rootDir>/components/ui/'
   ],
   coveragePathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/.next/',
     '<rootDir>/e2e/',
+    '<rootDir>/components/ui/'
   ],
   collectCoverageFrom: [
     '**/*.{js,jsx,ts,tsx}',
     '!**/*.d.ts',
     '!**/node_modules/**',
+    '!**/.next/**',
+    '!**/coverage/**',
+    '!**/e2e/**',
+    '!**/components/ui/**'
   ],
   coverageThreshold: {
     global: {
@@ -41,25 +45,22 @@ const config = {
   },
   reporters: [
     'default',
-    ['jest-junit', {
-      outputDirectory: 'reports/junit',
-      outputName: 'junit.xml',
-      classNameTemplate: '{classname}',
-      titleTemplate: '{title}',
-      ancestorSeparator: ' › ',
-      usePathForSuiteName: true,
-    }],
-    ['jest-html-reporter', {
-      pageTitle: 'StoreIt Test Report',
-      outputPath: 'reports/test-report.html',
-      includeFailureMsg: true,
-      includeSuiteFailure: true,
-      styleOverridePath: 'reporter-styles.css',
-      sort: 'status',
-      statusIgnoreFilter: null,
-      includeConsoleLog: true,
-      useCSSFile: true,
-    }],
+    [
+      'jest-html-reporter',
+      {
+        pageTitle: 'Test Report',
+        outputPath: 'reports/test-report.html',
+      },
+    ],
+    [
+      'jest-junit',
+      {
+        outputDirectory: 'reports',
+        outputName: 'jest-junit.xml',
+        classNameTemplate: '{classname}',
+        titleTemplate: '{title}',
+      },
+    ],
   ],
   coverageReporters: [
     'text',

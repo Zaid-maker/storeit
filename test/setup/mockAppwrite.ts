@@ -1,33 +1,31 @@
-import { vi } from 'vitest';
-
 // Mock the entire appwrite module
-vi.mock('@/lib/appwrite/index', () => ({
-  createSessionClient: vi.fn().mockImplementation(() => ({
+jest.mock('@/lib/appwrite/index', () => ({
+  createSessionClient: jest.fn().mockImplementation(() => ({
     account: {
-      get: vi.fn().mockResolvedValue({
+      get: jest.fn().mockResolvedValue({
         $id: 'test-user-id',
         name: 'Test User',
         email: 'test@example.com',
       }),
     },
     databases: {
-      listDocuments: vi.fn().mockResolvedValue({
+      listDocuments: jest.fn().mockResolvedValue({
         documents: [],
         total: 0,
       }),
-      createDocument: vi.fn().mockResolvedValue({
+      createDocument: jest.fn().mockResolvedValue({
         $id: 'test-doc-id',
       }),
     },
   })),
-  createAdminClient: vi.fn().mockImplementation(() => ({
+  createAdminClient: jest.fn().mockImplementation(() => ({
     account: {
-      create: vi.fn().mockResolvedValue({
+      create: jest.fn().mockResolvedValue({
         $id: 'test-user-id',
       }),
     },
     databases: {
-      listDocuments: vi.fn().mockResolvedValue({
+      listDocuments: jest.fn().mockResolvedValue({
         documents: [],
         total: 0,
       }),
@@ -36,9 +34,9 @@ vi.mock('@/lib/appwrite/index', () => ({
 }));
 
 // Mock the next/headers module
-vi.mock('next/headers', () => ({
-  cookies: vi.fn().mockReturnValue({
-    get: vi.fn().mockReturnValue({
+jest.mock('next/headers', () => ({
+  cookies: jest.fn().mockReturnValue({
+    get: jest.fn().mockReturnValue({
       value: 'mock-session-value',
     }),
   }),

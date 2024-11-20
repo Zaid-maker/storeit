@@ -2,37 +2,59 @@ import '@testing-library/jest-dom';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
-  useRouter() {
-    return {
-      push: jest.fn(),
-      replace: jest.fn(),
-      prefetch: jest.fn(),
-      back: jest.fn(),
-      refresh: jest.fn(),
-      forward: jest.fn(),
-    };
-  },
-  useSearchParams() {
-    return new URLSearchParams();
-  },
-  usePathname() {
-    return '';
-  },
-  useParams() {
-    return {};
-  },
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+  useSearchParams: () => ({
+    get: jest.fn(),
+  }),
+  usePathname: () => '',
 }));
 
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ src, alt, ...props }: any) => {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} {...props} />;
-  },
+  default: jest.fn().mockImplementation(({ src, alt, ...props }) => (
+    Object.assign(document.createElement('img'), { src, alt, ...props })
+  )),
 }));
 
-// Mock useToast
+// Mock shadcn/ui components
+jest.mock('@/components/ui/button', () => ({
+  Button: jest.fn().mockImplementation((props) => 
+    Object.assign(document.createElement('button'), props)
+  ),
+}));
+
+jest.mock('@/components/ui/form', () => ({
+  Form: jest.fn().mockImplementation((props) => 
+    Object.assign(document.createElement('form'), props)
+  ),
+  FormField: jest.fn().mockImplementation((props) => 
+    Object.assign(document.createElement('div'), props)
+  ),
+  FormItem: jest.fn().mockImplementation((props) => 
+    Object.assign(document.createElement('div'), props)
+  ),
+  FormLabel: jest.fn().mockImplementation((props) => 
+    Object.assign(document.createElement('label'), props)
+  ),
+  FormControl: jest.fn().mockImplementation((props) => 
+    Object.assign(document.createElement('div'), props)
+  ),
+  FormMessage: jest.fn().mockImplementation((props) => 
+    Object.assign(document.createElement('span'), props)
+  ),
+}));
+
+jest.mock('@/components/ui/input', () => ({
+  Input: jest.fn().mockImplementation((props) => 
+    Object.assign(document.createElement('input'), props)
+  ),
+}));
+
 jest.mock('@/components/ui/use-toast', () => ({
   useToast: () => ({
     toast: jest.fn(),
