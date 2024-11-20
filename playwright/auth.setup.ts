@@ -1,30 +1,32 @@
-import { test as setup, expect } from '@playwright/test';
+import { test as setup } from '@playwright/test';
 
-setup('authenticate', async ({ page }) => {
-  // Mock the authentication state
-  await page.route('**/api/auth/**', async route => {
-    await route.fulfill({
-      status: 200,
-      body: JSON.stringify({
-        user: {
-          id: 'test-user-id',
-          name: 'Test User',
-          email: 'test@example.com',
-        },
-      }),
-    });
-  });
+const authFile = 'playwright/.auth/user.json';
 
-  // Set mock cookies
-  await page.context().addCookies([
-    {
+setup('authenticate', async ({ request }) => {
+  // Create a storage state file for authentication
+  const storageState = {
+    cookies: [{
       name: 'appwrite-session',
       value: 'mock-session-value',
       domain: 'localhost',
       path: '/',
-    },
-  ]);
+    }],
+    origins: [{
+      origin: 'http://localhost:3000',
+      localStorage: [{
+        name: 'user',
+        value: JSON.stringify({
+          id: 'test-user-id',
+          name: 'Test User',
+          email: 'test@example.com',
+        })
+      }]
+    }]
+  };
 
-  // Save signed-in state
-  await page.context().storageState({ path: 'playwright/.auth/user.json' });
+  // Save the authentication state to a file
+  await setup.expect(async () => {
+    const fs = require('fs/promises');
+    await fs.writeFile(authFile, JSON.stringify(storageState));
+  }).toPass();
 });

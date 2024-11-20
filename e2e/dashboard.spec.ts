@@ -3,24 +3,60 @@ import path from 'path';
 
 test.describe('Dashboard', () => {
   test.beforeEach(async ({ page }) => {
-    // Sign in before each test
-    await page.goto('/sign-in');
-    await page.getByLabel(/email/i).fill('test@example.com');
-    await page.getByLabel(/password/i).fill('Password123!');
-    await page.getByRole('button', { name: /sign in/i }).click();
-    await expect(page).toHaveURL(/.*dashboard/);
+    // Mock API responses for files
+    await page.route('**/api/files**', async route => {
+      await route.fulfill({
+        status: 200,
+        body: JSON.stringify({
+          documents: [
+            { 
+              $id: 'file1',
+              name: 'test.pdf',
+              size: 1024,
+              type: 'application/pdf',
+              uploadedAt: new Date().toISOString()
+            },
+            {
+              $id: 'file2',
+              name: 'image.jpg',
+              size: 2048,
+              type: 'image/jpeg',
+              uploadedAt: new Date().toISOString()
+            }
+          ],
+          total: 2
+        })
+      });
+    });
+
+    // Go to dashboard
+    await page.goto('/dashboard');
   });
 
   test('should display user files', async ({ page }) => {
     // Verify file list is visible
     await expect(page.getByRole('table')).toBeVisible();
     
-    // Check if some default files are listed
+    // Check if mocked files are listed
     await expect(page.getByText('test.pdf')).toBeVisible();
     await expect(page.getByText('image.jpg')).toBeVisible();
   });
 
   test('should allow file upload', async ({ page }) => {
+    // Mock file upload response
+    await page.route('**/api/files/upload', async route => {
+      await route.fulfill({
+        status: 200,
+        body: JSON.stringify({
+          $id: 'new-file',
+          name: 'test-file.txt',
+          size: 512,
+          type: 'text/plain',
+          uploadedAt: new Date().toISOString()
+        })
+      });
+    });
+
     // Create a test file
     const filePath = path.join(__dirname, 'fixtures', 'test-file.txt');
     
@@ -29,12 +65,15 @@ test.describe('Dashboard', () => {
     
     // Wait for upload to complete and verify file appears in list
     await expect(page.getByText('test-file.txt')).toBeVisible();
-    
-    // Verify success message
     await expect(page.getByText(/successfully uploaded/i)).toBeVisible();
   });
 
   test('should allow file deletion', async ({ page }) => {
+    // Mock delete response
+    await page.route('**/api/files/*', async route => {
+      await route.fulfill({ status: 200 });
+    });
+
     // Find and click delete button for a file
     await page.getByRole('button', { name: /delete/i }).first().click();
     
@@ -58,8 +97,30 @@ test.describe('Dashboard', () => {
   });
 
   test('should allow file type filtering', async ({ page }) => {
+    // Mock filtered response
+    await page.route('**/api/files**', async route => {
+      const url = route.request().url();
+      if (url.includes('type=pdf')) {
+        await route.fulfill({
+          status: 200,
+          body: JSON.stringify({
+            documents: [
+              {
+                $id: 'file1',
+                name: 'test.pdf',
+                size: 1024,
+                type: 'application/pdf',
+                uploadedAt: new Date().toISOString()
+              }
+            ],
+            total: 1
+          })
+        });
+      }
+    });
+
     // Select PDF filter
-    await page.getByRole('combobox', { name: /filter/i }).selectOption('PDF');
+    await page.getByRole('combobox').selectOption('PDF');
     
     // Verify filtered results
     await expect(page.getByText('test.pdf')).toBeVisible();

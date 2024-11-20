@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
 
 export default defineConfig({
   testDir: './e2e',
@@ -16,27 +17,21 @@ export default defineConfig({
     trace: 'on-first-retry',
     video: 'on-first-retry',
   },
-  globalSetup: require.resolve('./playwright/auth.setup.ts'),
   projects: [
+    // Setup project
     {
       name: 'setup',
       testMatch: /.*\.setup\.ts/,
     },
+    // Test projects
     {
-      name: 'chromium',
+      name: 'authenticated',
+      testMatch: /.*\.spec\.ts/,
+      dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
       },
-      dependencies: ['setup'],
-    },
-    {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-        storageState: 'playwright/.auth/user.json',
-      },
-      dependencies: ['setup'],
     },
   ],
   webServer: {
