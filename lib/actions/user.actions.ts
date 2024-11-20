@@ -1,10 +1,11 @@
 "use server";
 
-import { get } from "http";
+import { avatarPlaceholderUrl } from "@/constants";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { ID, Query } from "node-appwrite";
 import { createAdminClient, createSessionClient } from "../appwrite";
 import { appwriteConfig } from "../appwrite/config";
-import { ID, Query } from "node-appwrite";
-import { avatarPlaceholderUrl } from "@/constants";
 import { parseStringify } from "../utils";
 
 const getUserByEmail = async (email: string) => {
@@ -19,6 +20,11 @@ const getUserByEmail = async (email: string) => {
   return result.total > 0 ? result.documents[0] : null;
 };
 
+const handleError = (error: unknown, message: string) => {
+  console.log(error, message);
+  throw error;
+};
+
 export const sendEmailOTP = async ({ email }: { email: string }) => {
   const { account } = await createAdminClient();
 
@@ -27,7 +33,7 @@ export const sendEmailOTP = async ({ email }: { email: string }) => {
 
     return session.userId;
   } catch (error) {
-    // TODO: handle error
+    handleError(error, "Failed to send email OTP");
   }
 };
 
@@ -84,5 +90,33 @@ export const getCurrentUser = async () => {
     return parseStringify(user.documents[0]);
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const signOut = async () => {
+  const { account } = await createSessionClient();
+
+  try {
+    await account.deleteSession("current");
+    (await cookies()).delete("appwrite-session");
+  } catch (error) {
+    handleError(error, "Failed to sign out");
+  } finally {
+    redirect("/sign-in");
+  }
+};
+
+export const signIn = async ({ email }: { email: string }) => {
+  try {
+    const existingUser = await getUserByEmail(email);
+
+    // User exists, send email OTP
+    if (existingUser) {
+      await sendEmailOTP({ email });
+
+      return parseStringify({ accountId: existingUser.accountId });
+    }
+  } catch (error) {
+    handleError(error, "Failed to sign in");
   }
 };
