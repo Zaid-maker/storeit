@@ -16,9 +16,20 @@ const config: Config = {
     '^@/app/(.*)$': '<rootDir>/app/$1',
     '^@/lib/(.*)$': '<rootDir>/lib/$1',
   },
+  transform: {
+    '^.+\\.(ts|tsx|js|jsx)$': ['babel-jest', { presets: ['next/babel'] }],
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(node-fetch-native-with-agent|node-appwrite)/)',
+  ],
   coveragePathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/.next/',
+  ],
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/.next/',
+    '<rootDir>/e2e/',
   ],
 };
 

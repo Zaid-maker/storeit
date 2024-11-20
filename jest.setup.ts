@@ -16,49 +16,47 @@ jest.mock('next/navigation', () => ({
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: jest.fn().mockImplementation(({ src, alt, ...props }) => (
-    Object.assign(document.createElement('img'), { src, alt, ...props })
-  )),
+  default: jest.fn().mockImplementation(() => null),
 }));
 
 // Mock shadcn/ui components
 jest.mock('@/components/ui/button', () => ({
-  Button: jest.fn().mockImplementation((props) => 
-    Object.assign(document.createElement('button'), props)
-  ),
+  Button: jest.fn().mockImplementation(() => null),
 }));
 
 jest.mock('@/components/ui/form', () => ({
-  Form: jest.fn().mockImplementation((props) => 
-    Object.assign(document.createElement('form'), props)
-  ),
-  FormField: jest.fn().mockImplementation((props) => 
-    Object.assign(document.createElement('div'), props)
-  ),
-  FormItem: jest.fn().mockImplementation((props) => 
-    Object.assign(document.createElement('div'), props)
-  ),
-  FormLabel: jest.fn().mockImplementation((props) => 
-    Object.assign(document.createElement('label'), props)
-  ),
-  FormControl: jest.fn().mockImplementation((props) => 
-    Object.assign(document.createElement('div'), props)
-  ),
-  FormMessage: jest.fn().mockImplementation((props) => 
-    Object.assign(document.createElement('span'), props)
-  ),
+  Form: jest.fn().mockImplementation(({ children }) => children),
+  FormField: jest.fn().mockImplementation(({ children }) => children),
+  FormItem: jest.fn().mockImplementation(({ children }) => children),
+  FormLabel: jest.fn().mockImplementation(({ children }) => children),
+  FormControl: jest.fn().mockImplementation(({ children }) => children),
+  FormMessage: jest.fn().mockImplementation(({ children }) => children),
 }));
 
 jest.mock('@/components/ui/input', () => ({
-  Input: jest.fn().mockImplementation((props) => 
-    Object.assign(document.createElement('input'), props)
-  ),
+  Input: jest.fn().mockImplementation(() => null),
 }));
 
-jest.mock('@/components/ui/use-toast', () => ({
-  useToast: () => ({
-    toast: jest.fn(),
-  }),
+// Mock node-appwrite
+jest.mock('node-appwrite', () => ({
+  Client: jest.fn().mockImplementation(() => ({
+    setEndpoint: jest.fn(),
+    setProject: jest.fn(),
+  })),
+  Account: jest.fn().mockImplementation(() => ({
+    createEmailToken: jest.fn().mockResolvedValue({ userId: 'mock-user-id' }),
+    createEmailSession: jest.fn().mockResolvedValue({ userId: 'mock-user-id' }),
+    get: jest.fn().mockResolvedValue({ $id: 'mock-user-id', email: 'test@example.com' }),
+  })),
+  ID: {
+    unique: jest.fn().mockReturnValue('mock-unique-id'),
+  },
+}));
+
+// Mock user actions
+jest.mock('@/lib/actions/user.actions', () => ({
+  createUserAccount: jest.fn().mockResolvedValue({ userId: 'mock-user-id' }),
+  signInAccount: jest.fn().mockResolvedValue({ userId: 'mock-user-id' }),
 }));
 
 // Setup global fetch mock
@@ -72,26 +70,4 @@ global.fetch = jest.fn(() =>
 // Reset all mocks after each test
 afterEach(() => {
   jest.clearAllMocks();
-});
-
-// Add custom matchers or global test configuration here
-expect.extend({
-  toHaveBeenCalledWithMatch(received: jest.Mock, ...expected: any[]) {
-    const pass = received.mock.calls.some((call) =>
-      expected.every((arg, i) => {
-        if (typeof arg === 'object') {
-          return expect.objectContaining(arg).asymmetricMatch(call[i]);
-        }
-        return arg === call[i];
-      })
-    );
-
-    return {
-      pass,
-      message: () =>
-        `expected ${received.getMockName()} to ${
-          pass ? 'not ' : ''
-        }have been called with arguments matching ${expected.join(', ')}`,
-    };
-  },
 });
