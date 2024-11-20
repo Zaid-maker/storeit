@@ -47,7 +47,7 @@ export const createAccount = async ({
   const existingUser = await getUserByEmail(email);
 
   const accountId = await sendEmailOTP({ email });
-  if (!accountId) throw new Error("Something went wrong");
+  if (!accountId) throw new Error("Failed to send an OTP");
 
   if (!existingUser) {
     const { databases } = await createAdminClient();
@@ -82,7 +82,7 @@ export const getCurrentUser = async () => {
     const user = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollectionId,
-      [Query.equal("accountId", [result.$id])]
+      [Query.equal("accountId", result.$id)]
     );
 
     if (user.total <= 0) return null;
@@ -93,14 +93,14 @@ export const getCurrentUser = async () => {
   }
 };
 
-export const signOut = async () => {
+export const signOutUser = async () => {
   const { account } = await createSessionClient();
 
   try {
     await account.deleteSession("current");
     (await cookies()).delete("appwrite-session");
   } catch (error) {
-    handleError(error, "Failed to sign out");
+    handleError(error, "Failed to sign out user");
   } finally {
     redirect("/sign-in");
   }
@@ -110,13 +110,15 @@ export const signInUser = async ({ email }: { email: string }) => {
   try {
     const existingUser = await getUserByEmail(email);
 
-    // User exists, send email OTP
+    // User exists, send OTP
     if (existingUser) {
       await sendEmailOTP({ email });
 
       return parseStringify({ accountId: existingUser.accountId });
     }
+
+    return parseStringify({ accountId: null, error: "User not found" });
   } catch (error) {
-    handleError(error, "Failed to sign in");
+    handleError(error, "Failed to sign in user");
   }
 };
