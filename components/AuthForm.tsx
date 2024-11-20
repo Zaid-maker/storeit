@@ -1,3 +1,8 @@
+/**
+ * AuthForm Component - Handles both sign-up and sign-in functionality
+ * This is a client-side component as indicated by the 'use client' directive
+ */
+
 "use client";
 
 import { createAccount, signIn } from "@/lib/actions/user.actions";
@@ -18,21 +23,35 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 
+// Type definition for the form modes
 type FormType = "sign-up" | "sign-in";
 
+/**
+ * Schema generator for form validation
+ * @param formType - The type of form ('sign-up' or 'sign-in')
+ * @returns Zod schema object with validation rules
+ */
 const authFormSchema = (formType: FormType) => {
   return z.object({
-    email: z.string().email(),
-    fullName: formType === "sign-up" ? z.string().min(3) : z.string().min(3),
+    email: z.string().email(), // Validates email format
+    fullName: formType === "sign-up" ? z.string().min(3) : z.string().min(3), // Requires minimum 3 characters
   });
 };
 
+/**
+ * AuthForm Component
+ * @param type - Determines whether the form behaves as a sign-up or sign-in form
+ */
 const AuthForm = ({ type }: { type: FormType }) => {
+  // State management for form submission and error handling
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [accountId, setAccountId] = useState(null);
 
+  // Initialize form validation schema based on form type
   const formSchema = authFormSchema(type);
+  
+  // Initialize form with React Hook Form and Zod resolver
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,17 +61,15 @@ const AuthForm = ({ type }: { type: FormType }) => {
   });
 
   /**
-   * Handles form submission.
-   *
-   * @param {z.infer<typeof formSchema>} values - Form values.
-   * @returns {Promise<void>}
+   * Form submission handler
+   * @param values - Form values that match the schema type
    */
   const onSubmit = async (
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
     setIsLoading(true);
     setErrorMessage("");
-
+    
     try {
       const user =
         type === "sign-up"
