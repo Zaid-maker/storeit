@@ -41,7 +41,15 @@ const AuthForm = ({ type }: { type: FormType }) => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  /**
+   * Handles form submission.
+   *
+   * @param {z.infer<typeof formSchema>} values - Form values.
+   * @returns {Promise<void>}
+   */
+  const onSubmit = async (
+    values: z.infer<typeof formSchema>
+  ): Promise<void> => {
     setIsLoading(true);
     setErrorMessage("");
 
