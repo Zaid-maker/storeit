@@ -5,7 +5,7 @@
 
 "use client";
 
-import { createAccount, signIn } from "@/lib/actions/user.actions";
+import { createAccount, signInUser } from "@/lib/actions/user.actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
@@ -50,7 +50,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
   // Initialize form validation schema based on form type
   const formSchema = authFormSchema(type);
-  
+
   // Initialize form with React Hook Form and Zod resolver
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -64,12 +64,10 @@ const AuthForm = ({ type }: { type: FormType }) => {
    * Form submission handler
    * @param values - Form values that match the schema type
    */
-  const onSubmit = async (
-    values: z.infer<typeof formSchema>
-  ): Promise<void> => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     setErrorMessage("");
-    
+
     try {
       const user =
         type === "sign-up"
@@ -77,11 +75,11 @@ const AuthForm = ({ type }: { type: FormType }) => {
               fullName: values.fullName || "",
               email: values.email,
             })
-          : await signIn({ email: values.email });
+          : await signInUser({ email: values.email });
 
       setAccountId(user.accountId);
     } catch {
-      setErrorMessage("Something went wrong. Please try again later.");
+      setErrorMessage("Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -154,29 +152,29 @@ const AuthForm = ({ type }: { type: FormType }) => {
             )}
           </Button>
 
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
+          {errorMessage && <p className="error-message">*{errorMessage}</p>}
 
           <div className="body-2 flex justify-center">
             <p className="text-light-100">
               {type === "sign-in"
                 ? "Don't have an account?"
                 : "Already have an account?"}
-              <Link
-                href={type === "sign-in" ? "/sign-up" : "/sign-in"}
-                className="ml-1 font-medium text-brand"
-              >
-                {" "}
-                {type === "sign-in" ? "Sign Up" : "Sign In"}
-              </Link>
             </p>
+            <Link
+              href={type === "sign-in" ? "/sign-up" : "/sign-in"}
+              className="ml-1 font-medium text-brand"
+            >
+              {" "}
+              {type === "sign-in" ? "Sign Up" : "Sign In"}
+            </Link>
           </div>
         </form>
       </Form>
 
-      {accountId && (
+      {/* {accountId && (
         // TODO: Add OTPModal component
         <div>OTPModal</div>
-      )}
+      )} */}
     </>
   );
 };

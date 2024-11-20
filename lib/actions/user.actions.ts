@@ -106,7 +106,7 @@ export const signOut = async () => {
   }
 };
 
-export const signIn = async ({ email }: { email: string }) => {
+export const signInUser = async ({ email }: { email: string }) => {
   try {
     const existingUser = await getUserByEmail(email);
 
