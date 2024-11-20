@@ -46,7 +46,25 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report/
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 30
+
+      - name: Upload test results (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-html
+          path: playwright-report
+          retention-days: 30
+
+      - name: Upload test results (JUnit)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-junit
+          path: reports/playwright-junit.xml
           retention-days: 30
 
   integration:
@@ -77,65 +95,3 @@ jobs:
             coverage/
             reports/
           retention-days: 30
-
-  publish-reports:
-    needs: [test, integration]
-    runs-on: ubuntu-latest
-    if: always()
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Build report site
-        run: |
-          mkdir -p _site
-          cp -r artifacts/coverage-report/* _site/
-          cp -r artifacts/playwright-report/* _site/playwright
-          # Create index page
-          cat > _site/index.html << 'EOL'
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>StoreIt Test Reports</title>
-            <style>
-              body { font-family: system-ui; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-              .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
-              .card h2 { margin-top: 0; }
-              a { color: #4299e1; text-decoration: none; }
-              a:hover { text-decoration: underline; }
-            </style>
-          </head>
-          <body>
-            <h1>StoreIt Test Reports</h1>
-            <div class="card">
-              <h2>Coverage Report</h2>
-              <p><a href="./lcov-report/index.html">View Coverage Report</a></p>
-            </div>
-            <div class="card">
-              <h2>Test Results</h2>
-              <p><a href="./test-report.html">View Test Report</a></p>
-            </div>
-            <div class="card">
-              <h2>E2E Test Results</h2>
-              <p><a href="./playwright/index.html">View Playwright Report</a></p>
-            </div>
-          </body>
-          </html>
-          EOL
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
