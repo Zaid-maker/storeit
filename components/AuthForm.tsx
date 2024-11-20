@@ -1,6 +1,6 @@
 "use client";
 
-import { createAccount } from "@/lib/actions/user.actions";
+import { createAccount, signIn } from "@/lib/actions/user.actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
@@ -60,7 +60,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
               fullName: values.fullName || "",
               email: values.email,
             })
-          : null;
+          : await signIn({ email: values.email });
 
       setAccountId(user.accountId);
     } catch {
