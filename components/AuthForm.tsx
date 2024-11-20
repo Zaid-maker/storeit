@@ -9,6 +9,7 @@ import { createAccount, signIn } from "@/lib/actions/user.actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -46,7 +47,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
   // State management for form submission and error handling
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [accountId, setAccountId] = useState(null);
+  const router = useRouter();
 
   // Initialize form validation schema based on form type
   const formSchema = authFormSchema(type);
@@ -71,15 +72,14 @@ const AuthForm = ({ type }: { type: FormType }) => {
     setErrorMessage("");
     
     try {
-      const user =
-        type === "sign-up"
-          ? await createAccount({
-              fullName: values.fullName || "",
-              email: values.email,
-            })
-          : await signIn({ email: values.email });
-
-      setAccountId(user.accountId);
+      await (type === "sign-up"
+        ? await createAccount({
+            fullName: values.fullName || "",
+            email: values.email,
+          })
+        : await signIn({ email: values.email }));
+        
+      router.push("/");
     } catch {
       setErrorMessage("Something went wrong. Please try again later.");
     } finally {

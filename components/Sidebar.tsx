@@ -1,19 +1,18 @@
 "use client";
 
-import { navItems } from "@/constants";
 import { cn } from "@/lib/utils";
+import { navItems } from "@/constants";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import React from "react";
 
 type Props = {
   fullName: string;
   email: string;
-  avatar: string;
 };
 
-export const Sidebar = ({ fullName, email, avatar }: Props) => {
+export const Sidebar = ({ fullName, email }: Props) => {
   const pathname = usePathname();
 
   return (
@@ -42,8 +41,8 @@ export const Sidebar = ({ fullName, email, avatar }: Props) => {
             <Link key={name} href={url} className="lg:w-full">
               <li
                 className={cn(
-                  "sidebar-nav-item",
-                  pathname === url && "shad-active"
+                  "flex items-center gap-2 p-4 lg:justify-start transition-all hover:bg-light-400 dark:hover:bg-dark-200",
+                  pathname === url && "bg-light-400 dark:bg-dark-200"
                 )}
               >
                 <Image

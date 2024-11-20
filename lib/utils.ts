@@ -1,9 +1,13 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+// Define FileType type
+export type FileType = "document" | "image" | "video" | "audio" | "other";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
 export const parseStringify = (value: unknown) =>
   JSON.parse(JSON.stringify(value));
 
@@ -183,7 +187,28 @@ export const constructDownloadUrl = (bucketFileId: string) => {
 };
 
 // DASHBOARD UTILS
-export const getUsageSummary = (totalSpace: any) => {
+interface SpaceInfo {
+  size: number;
+  latestDate: string;
+}
+
+interface TotalSpace {
+  document: SpaceInfo;
+  image: SpaceInfo;
+  video: SpaceInfo;
+  audio: SpaceInfo;
+  other: SpaceInfo;
+}
+
+interface UsageSummaryItem {
+  title: string;
+  size: number;
+  latestDate: string;
+  icon: string;
+  url: string;
+}
+
+export const getUsageSummary = (totalSpace: TotalSpace): UsageSummaryItem[] => {
   return [
     {
       title: "Documents",
