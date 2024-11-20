@@ -172,6 +172,11 @@ const AuthForm = ({ type }: { type: FormType }) => {
           </div>
         </form>
       </Form>
+
+      {accountId && (
+        // TODO: Add OTPModal component
+        <div>OTPModal</div>
+      )}
     </>
   );
 };
