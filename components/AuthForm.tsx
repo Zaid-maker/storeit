@@ -1,9 +1,13 @@
 "use client";
 
-import { set, z } from "zod";
+import { createAccount } from "@/lib/actions/user.actions";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "./ui/button";
 import {
   Form,
   FormControl,
@@ -13,9 +17,6 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import Link from "next/link";
-import { createAccount } from "@/lib/actions/user.actions";
 
 type FormType = "sign-up" | "sign-in";
 
@@ -54,7 +55,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           : null;
 
       setAccountId(user.accountId);
-    } catch (error) {
+    } catch {
       setErrorMessage("Something went wrong. Please try again later.");
     } finally {
       setIsLoading(false);
@@ -118,7 +119,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
             {type === "sign-in" ? "Sign In" : "Sign Up"}
 
             {isLoading && (
-              // @ts-ignore
               <Image
                 src="/assets/icons/loader.svg"
                 alt="loader"
