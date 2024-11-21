@@ -15,13 +15,19 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { sendEmailOTP } from "@/lib/actions/user.actions";
+import { sendEmailOTP, verifySecret } from "@/lib/actions/user.actions";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "./ui/button";
 
-const OtpModal = ({ fullName, email }: { fullName: string; email: string }) => {
+const OtpModal = ({
+  accountId,
+  email,
+}: {
+  accountId: string;
+  email: string;
+}) => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(true);
   const [password, setPassword] = useState("");
@@ -30,6 +36,16 @@ const OtpModal = ({ fullName, email }: { fullName: string; email: string }) => {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsLoading(true);
+
+    try {
+      const sessionId = await verifySecret({ accountId, password });
+
+      console.log({ sessionId });
+
+      if (!sessionId) router.push("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleResendOtp = async () => {
