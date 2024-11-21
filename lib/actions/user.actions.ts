@@ -1,12 +1,12 @@
 "use server";
 
 import { avatarPlaceholderUrl } from "@/constants";
+import { createAdminClient, createSessionClient } from "@/lib/appwrite";
+import { appwriteConfig } from "@/lib/appwrite/config";
+import { parseStringify } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ID, Query } from "node-appwrite";
-import { createAdminClient, createSessionClient } from "../appwrite";
-import { appwriteConfig } from "../appwrite/config";
-import { parseStringify } from "../utils";
 
 const getUserByEmail = async (email: string) => {
   const { databases } = await createAdminClient();
@@ -80,7 +80,7 @@ export const verifySecret = async ({
 
     const session = await account.createSession(accountId, password);
 
-    (await cookies()).set("appwrite-session", session.$id, {
+    (await cookies()).set("appwrite-session", session.secret, {
       path: "/",
       httpOnly: true,
       sameSite: "strict",
@@ -93,11 +93,6 @@ export const verifySecret = async ({
   }
 };
 
-/**
- * Gets the current user based on the session.
- *
- * @returns The current user in the system if a session exists, otherwise null.
- */
 export const getCurrentUser = async () => {
   try {
     const { databases, account } = await createSessionClient();
