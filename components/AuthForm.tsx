@@ -22,6 +22,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import OtpModal from "./OTPModal";
 
 // Type definition for the form modes
 type FormType = "sign-up" | "sign-in";
@@ -171,10 +172,9 @@ const AuthForm = ({ type }: { type: FormType }) => {
         </form>
       </Form>
 
-      {/* {accountId && (
-        // TODO: Add OTPModal component
-        <div>OTPModal</div>
-      )} */}
+      {accountId && (
+        <OtpModal accountId={accountId} email={form.getValues("email")} />
+      )}
     </>
   );
 };

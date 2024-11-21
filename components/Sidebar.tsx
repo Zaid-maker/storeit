@@ -5,15 +5,14 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
 
-type Props = {
+interface Props {
   fullName: string;
-  email: string;
   avatar: string;
-};
+  email: string;
+}
 
-export const Sidebar = ({ fullName, email, avatar }: Props) => {
+const Sidebar = ({ fullName, avatar, email }: Props) => {
   const pathname = usePathname();
 
   return (
@@ -37,7 +36,7 @@ export const Sidebar = ({ fullName, email, avatar }: Props) => {
       </Link>
 
       <nav className="sidebar-nav">
-        <div className="flex flex-col flex-1 gap-6">
+        <ul className="flex flex-1 flex-col gap-6">
           {navItems.map(({ url, name, icon }) => (
             <Link key={name} href={url} className="lg:w-full">
               <li
@@ -60,7 +59,7 @@ export const Sidebar = ({ fullName, email, avatar }: Props) => {
               </li>
             </Link>
           ))}
-        </div>
+        </ul>
       </nav>
 
       <Image
@@ -87,3 +86,5 @@ export const Sidebar = ({ fullName, email, avatar }: Props) => {
     </aside>
   );
 };
+
+export default Sidebar;
