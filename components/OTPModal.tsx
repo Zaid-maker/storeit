@@ -15,11 +15,11 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { sendEmailOTP, verifySecret } from "@/lib/actions/user.actions";
+import React, { useState } from "react";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { verifySecret, sendEmailOTP } from "@/lib/actions/user.actions";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Button } from "./ui/button";
 
 const OtpModal = ({
   accountId,
@@ -37,15 +37,19 @@ const OtpModal = ({
     e.preventDefault();
     setIsLoading(true);
 
+    console.log({ accountId, password });
+
     try {
       const sessionId = await verifySecret({ accountId, password });
 
       console.log({ sessionId });
 
-      if (!sessionId) router.push("/");
+      if (sessionId) router.push("/");
     } catch (error) {
-      console.log(error);
+      console.log("Failed to verify OTP", error);
     }
+
+    setIsLoading(false);
   };
 
   const handleResendOtp = async () => {
@@ -68,7 +72,7 @@ const OtpModal = ({
             />
           </AlertDialogTitle>
           <AlertDialogDescription className="subtitle-2 text-center text-light-100">
-            We&apos;ve sent a 6-digit code to{" "}
+            We&apos;ve sent a code to{" "}
             <span className="pl-1 text-brand">{email}</span>
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -87,7 +91,7 @@ const OtpModal = ({
         <AlertDialogFooter>
           <div className="flex w-full flex-col gap-4">
             <AlertDialogAction
-              onSubmit={handleSubmit}
+              onClick={handleSubmit}
               className="shad-submit-btn h-12"
               type="button"
             >
