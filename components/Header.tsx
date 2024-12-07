@@ -1,18 +1,21 @@
 import { signOutUser } from "@/lib/actions/user.actions";
 import Image from "next/image";
 import { Button } from "./ui/button";
+import Search from "./Search";
+import FileUploader from "./FileUploader";
 
-type HeaderProps = {
+const Header = ({
+  userId,
+  accountId,
+}: {
   userId: string;
   accountId: string;
-};
-
-const Header = ({ userId, accountId }: HeaderProps) => {
+}) => {
   return (
     <header className="header">
-      {/* <Search /> */}
+      <Search />
       <div className="header-wrapper">
-        {/* <FileUploader userId={userId} accountId={accountId} /> */}
+        <FileUploader ownerId={userId} accountId={accountId} />
         <form
           action={async () => {
             "use server";
