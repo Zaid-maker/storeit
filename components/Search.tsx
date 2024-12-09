@@ -1,9 +1,30 @@
-import React from 'react'
+"use client";
+
+import Image from "next/image";
+import React, { useState } from "react";
+import { Input } from "./ui/input";
 
 const Search = () => {
-  return (
-    <div>Search</div>
-  )
-}
+  const [query, setQuery] = useState("");
 
-export default Search
+  return (
+    <div className="search">
+      <div className="search-input-wrapper">
+        <Image
+          src="/assets/icons/search.svg"
+          alt="Search"
+          width={24}
+          height={24}
+        />
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search for files"
+          className="search-input"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default Search;

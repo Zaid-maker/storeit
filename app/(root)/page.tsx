@@ -6,7 +6,7 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <section>
         {/** TODO: Chart */}
-        <Chart />
+        {/* <Chart /> */}
 
         {/** TODO: Summary List */}
         <ul className="dashboard-summary-list"></ul>
