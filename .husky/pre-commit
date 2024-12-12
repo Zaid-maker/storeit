@@ -1,0 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Add co-author
+CO_AUTHOR="Co-authored-by: Zaid Hafeez <188496560+zaidhafeeez@users.noreply.github.com>"
+printf "\n%s\n" "$CO_AUTHOR" >> "$1"
